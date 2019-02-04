@@ -1,0 +1,7 @@
+sanity_check_en_es_data
+pytorch
+.DS_Store
+__pycache__
+model.bin
+model.bin.optim
+vocab.json
