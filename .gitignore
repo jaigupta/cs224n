@@ -1,6 +1,5 @@
 sanity_check_en_es_data
 pytorch
-en_es_data
 .DS_Store
 __pycache__
 model.bin
