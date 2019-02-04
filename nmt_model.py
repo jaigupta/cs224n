@@ -75,7 +75,7 @@ class NMT(nn.Module):
 
         # TODO: Should this have its own dropout?
         self.encoder = nn.LSTM(embed_size, hidden_size, bidirectional=True)
-        self.decoder = nn.LSTM(embed_size + hidden_size, hidden_size)
+        self.decoder = nn.LSTMCell(embed_size + hidden_size, hidden_size)
         self.h_projection = nn.Linear(2*hidden_size, hidden_size, bias=False)
         self.c_projection = nn.Linear(2*hidden_size, hidden_size, bias=False)
         self.att_projection = nn.Linear(2*hidden_size, hidden_size, bias=False)
@@ -248,12 +248,12 @@ class NMT(nn.Module):
         ###     Tensor Stacking:
         ###         https://pytorch.org/docs/stable/torch.html#torch.stack
 
-        enc_hiddens_proj = self.att_projection(enc_hiddens)
-        Y = self.model_embeddings.target(target_padded)
-        for Y_t in torch.split(Y, 1, dim=0):
-            Y_t = torch.squeeze(Y_t, dim=0)
-            Ybar_t = torch.cat([Y_t, o_prev], dim=1)
-            dec_state, o_t, _ = self.step(Ybar_t, dec_state, enc_hiddens, enc_hiddens_proj, enc_masks)
+        enc_hiddens_proj = self.att_projection(enc_hiddens)  # (b, src_len, h)
+        Y = self.model_embeddings.target(target_padded)  # (tgt_len, b, e)
+        for Y_t in torch.split(Y, 1, dim=0):  # (1, b, e)
+            Y_t = torch.squeeze(Y_t, dim=0)  # (b, e)
+            Ybar_t = torch.cat([Y_t, o_prev], dim=1)  # (b, e+h)
+            dec_state, o_t, _ = self.step(Ybar_t, dec_state, enc_hiddens, enc_hiddens_proj, enc_masks)  # ((b, h) (b, h)), (b, h)
             combined_outputs.append(o_t)
             o_prev = o_t
         combined_outputs = torch.stack(combined_outputs)
@@ -263,10 +263,10 @@ class NMT(nn.Module):
         return combined_outputs
 
 
-    def step(self, Ybar_t: torch.Tensor,
-            dec_state: Tuple[torch.Tensor, torch.Tensor],
-            enc_hiddens: torch.Tensor,
-            enc_hiddens_proj: torch.Tensor,
+    def step(self, Ybar_t: torch.Tensor,  # (b, h+e)
+            dec_state: Tuple[torch.Tensor, torch.Tensor],  # ((b,h), (b, h))
+            enc_hiddens: torch.Tensor,  # (b, src_len, 2h)
+            enc_hiddens_proj: torch.Tensor,  # (b, src_len, h)
             enc_masks: torch.Tensor) -> Tuple[Tuple, torch.Tensor, torch.Tensor]:
         """ Compute one forward step of the LSTM decoder, including the attention computation.
 
@@ -315,10 +315,8 @@ class NMT(nn.Module):
         ###     Tensor Squeeze:
         ###         https://pytorch.org/docs/stable/torch.html#torch.squeeze
 
-        _, dec_state = self.decoder(
-            torch.unsqueeze(Ybar_t, dim=0), (torch.unsqueeze(dec_state[0], dim=0), torch.unsqueeze(dec_state[1], dim=0)))
-        dec_hidden, dec_cell = dec_state[0][0], dec_state[1][0]
-        dec_state = (dec_hidden, dec_cell)
+        dec_state = self.decoder(Ybar_t, dec_state)
+        (dec_hidden, dec_cell) = dec_state
         e_t = torch.bmm(enc_hiddens_proj, torch.unsqueeze(dec_hidden, dim=2)).squeeze(dim=2)
 
         ### END YOUR CODE
