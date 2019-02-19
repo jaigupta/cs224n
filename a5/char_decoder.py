@@ -7,8 +7,6 @@ CS224N 2018-19: Homework 5
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import numpy as np
 
 class CharDecoder(nn.Module):
     def __init__(self, hidden_size, char_embedding_size=50, target_vocab=None):
@@ -36,7 +34,7 @@ class CharDecoder(nn.Module):
         self.vocab_size = len(target_vocab.char2id)
         self.char_output_projection = nn.Linear(hidden_size, self.vocab_size)
         self.padding_idx = target_vocab.char2id['<pad>']
-        self.decoderCharEmb = nn.Embedding(len(target_vocab.char2id),
+        self.decoderCharEmb = nn.Embedding(self.vocab_size,
                                            char_embedding_size,
                                            padding_idx=self.padding_idx)
 
@@ -78,10 +76,11 @@ class CharDecoder(nn.Module):
         ###       - char_sequence corresponds to the sequence x_1 ... x_{n+1} from the handout (e.g., <START>,m,u,s,i,c,<END>).
 
         s_t, (h_n, o_n) = self.forward(char_sequence, dec_hidden)
-        pad_mask = (char_sequence == self.padding_idx).unsqueeze(-1)
-        s_t.data.masked_fill_(pad_mask.byte(), -float('inf'))
-        s_t = s_t[:-1]  # The lost output is not useful
-        return nn.CrossEntropyLoss()(s_t.view(-1, s_t.shape[-1]), char_sequence[1:].contiguous().view(-1))
+        loss = nn.functional.cross_entropy(
+            s_t[:-1].view(-1, s_t.shape[-1]),
+            char_sequence[1:].contiguous().view(-1),
+            ignore_index=self.padding_idx)
+        return loss
 
         ### END YOUR CODE
 
@@ -107,16 +106,16 @@ class CharDecoder(nn.Module):
         batch_size = cur_states[0].shape[1]
         output_idxs = [[self.target_vocab.char2id['{']]*batch_size]
         while len(output_idxs) < max_length:
-          s_t, cur_states = self.forward(torch.LongTensor(output_idxs[-1:]), cur_states)
+          s_t, cur_states = self.forward(torch.cuda.LongTensor(output_idxs[-1:], device=device), cur_states)
           assert s_t.shape[:2] == (1, batch_size)
           idxs = torch.argmax(s_t, dim=-1)
-          output_idxs.append(idxs.squeeze(0).data.numpy().tolist())
+          output_idxs.append(idxs.squeeze(0).cpu().data.numpy().tolist())
 
         end_idx = self.target_vocab.char2id['}']
         outputs = []
         for b in range(batch_size):
           output_word = ''
-          for pos in range(max_length):
+          for pos in range(1, max_length):
             idx = output_idxs[pos][b]
             if idx == end_idx:
               break

@@ -7,6 +7,7 @@ CS224N 2018-19: Homework 5
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 ### YOUR CODE HERE for part 1i
 

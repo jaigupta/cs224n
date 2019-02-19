@@ -67,7 +67,6 @@ class VocabEntry(object):
         """ Retrieve word's index. Return the index for the unk
         token if the word is out of vocabulary.
         @param word (str): word to look up.
-        @returns index (int): index of word 
         """
         return self.word2id.get(word, self.unk_id)
 

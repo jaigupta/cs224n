@@ -28,7 +28,7 @@ class ModelEmbeddings(nn.Module):
     """
     Class that converts input words to their CNN-based embeddings.
     """
-    def __init__(self, embed_size, vocab):
+    def __init__(self, embed_size, vocab, dropout_prob=0.3):
         """
         Init the Embedding layer for one language
         @param embed_size (int): Embedding size (dimensionality) for the output
@@ -47,7 +47,7 @@ class ModelEmbeddings(nn.Module):
         self.embed = nn.Embedding(len(vocab.char2id), embed_size)
         self.cnn = CNN(embed_size)
         self.highway = Highway(embed_size)
-        self.dropout = nn.Dropout(0.3)
+        self.dropout = nn.Dropout(dropout_prob)
 
         ### END YOUR CODE
 

@@ -19,7 +19,7 @@ class Highway(nn.Module):
   def forward(self, x):
     x_proj = torch.relu(self.proj(x))
     x_gate = torch.sigmoid(self.gate(x))
-    x_highway = x_gate * x_proj + (1-x_gate)*x
+    x_highway = x_gate * x_proj + (1-x_gate) * x
     return x_highway
 
 ### END YOUR CODE
