@@ -3,5 +3,7 @@ pytorch
 __pycache__
 model.bin
 model.bin.optim
+model1.bin
+model1.bin.optim
 vocab.json
 ._*
