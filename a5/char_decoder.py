@@ -35,8 +35,8 @@ class CharDecoder(nn.Module):
         self.char_output_projection = nn.Linear(hidden_size, self.vocab_size)
         self.padding_idx = target_vocab.char2id['<pad>']
         self.decoderCharEmb = nn.Embedding(self.vocab_size,
-                                           char_embedding_size,
-                                           padding_idx=self.padding_idx)
+                char_embedding_size,
+                padding_idx=self.padding_idx)
 
         ### END YOUR CODE
 
@@ -77,9 +77,9 @@ class CharDecoder(nn.Module):
 
         s_t, (h_n, o_n) = self.forward(char_sequence, dec_hidden)
         loss = nn.functional.cross_entropy(
-            s_t[:-1].view(-1, s_t.shape[-1]),
-            char_sequence[1:].contiguous().view(-1),
-            ignore_index=self.padding_idx)
+                s_t[:-1].view(-1, s_t.shape[-1]),
+                char_sequence[1:].contiguous().view(-1),
+                ignore_index=self.padding_idx)
         return loss
 
         ### END YOUR CODE
@@ -106,18 +106,18 @@ class CharDecoder(nn.Module):
         batch_size = cur_states[0].shape[1]
         output_idxs = [[self.target_vocab.start_of_word]*batch_size]
         while len(output_idxs) < max_length:
-          s_t, cur_states = self.forward(torch.LongTensor(output_idxs[-1:], device=device), cur_states)
+            s_t, cur_states = self.forward(torch.LongTensor(output_idxs[-1:], device=device), cur_states)
           # assert s_t.shape[:2] == (1, batch_size)
           idxs = torch.argmax(s_t, dim=-1)
           output_idxs.append(idxs.squeeze(0).cpu().data.numpy().tolist())
 
         outputs = []
         for b in range(batch_size):
-          output_word = ''
+            output_word = ''
           for pos in range(1, max_length):
-            idx = output_idxs[pos][b]
+              idx = output_idxs[pos][b]
             if idx == self.target_vocab.end_of_word:
-              break
+                break
             output_word += self.target_vocab.id2char[idx]
           outputs.append(output_word)
         return outputs

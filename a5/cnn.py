@@ -5,14 +5,13 @@
 CS224N 2018-19: Homework 5
 """
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-
 ### YOUR CODE HERE for part 1i
 
+import torch
+import torch.nn as nn
+
 class CNN(nn.Module):
-    """ CNN class wraps a convolutional-nn to convert input sequence of 
+    """ CNN class wraps a convolutional-nn to convert input sequence of
     character level embeddings for variable length words (but padded to same
     length)into a single word-level embedding of same number of dimensions.
     """
@@ -33,7 +32,7 @@ class CNN(nn.Module):
         """Convert a sequence of character level embeeddings of size
         'embed_size' for variable length words (but padded to same length)
         to a single entry with same dimension representing the word-level embedding.
-        
+
         @param x (torch.Tensor): Input tensor of shape (sents_len, batch_size,
             word_len, embed_size) representing the charcter level embeddings.
 
