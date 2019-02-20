@@ -11,16 +11,14 @@ Michael Hahn <mhahn2@stanford.edu>
 """
 
 import torch.nn as nn
-from cnn import CNN
-from highway import Highway
 
 # Do not change these imports; your module names should be
 #   `CNN` in the file `cnn.py`
 #   `Highway` in the file `highway.py`
 # Uncomment the following two imports once you're ready to run part 1(j)
 
-# from cnn import CNN
-# from highway import Highway
+from cnn import CNN
+from highway import Highway
 
 # End "do not change"
 

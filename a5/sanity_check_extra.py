@@ -52,13 +52,24 @@ class DummyVocab():
         self.start_of_word = self.char2id["{"]
         self.end_of_word = self.char2id["}"]
 
-def question_1e_sanity_check():
-    """ Sanity check for words2charindices function. 
+def question_1h_sanity_check():
+    """ Sanity check for highway.Highway module. 
     """
     print ("-"*80)
-    print("Running Sanity Check for Question 1e: words2charindices()")
+    print("Running Sanity Check for Question 1h: highway.Highway module")
     print ("-"*80)
-    vocab = VocabEntry()
+
+    dim = 3
+    highway = Highway(dim)
+
+    assert highway.proj.weight.shape == (dim, dim), \
+            'Expected proj to have weight matrix of shape (%s, %s)' % (dim, dim)
+    assert highway.proj.bias.shape == (dim, dim), \
+            'Expected proj to have bias vector of shape (%s)' % (dim)
+    assert highway.gate.weight.shape == (dim, dim), \
+            'Expected gate to have weight matrix of shape (%s, %s)' % (dim, dim)
+    assert highway.gate.bias.shape == (dim, dim), \
+            'Expected gate to have bias vector of shape (%s)' % (dim)
 
     print('Running test on small list of sentences')
     sentences = [["a", "b", "c?"], ["~d~", "c", "b", "a"]]
