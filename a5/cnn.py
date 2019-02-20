@@ -47,7 +47,7 @@ class CNN(nn.Module):
         x = x.view(-1, embed_size, word_len)
         x = self.conv(x)
         x = self.relu(x)
-        x = torch.max(x, dim=-2)
+        x = torch.max(x, dim=-1)[0]
         return x.view(sents_len, batch_size, embed_size)
 
 ### END YOUR CODE

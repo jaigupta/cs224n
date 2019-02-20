@@ -1,4 +1,4 @@
-name: local_nmt2
+name: local_nmt
 channels:
   - soumith
   - defaults
