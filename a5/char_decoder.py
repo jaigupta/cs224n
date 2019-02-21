@@ -106,20 +106,20 @@ class CharDecoder(nn.Module):
         batch_size = cur_states[0].shape[1]
         output_idxs = [[self.target_vocab.start_of_word]*batch_size]
         while len(output_idxs) < max_length:
-          s_t, cur_states = self.forward(torch.tensor(output_idxs[-1:], device=device, dtype=torch.long), cur_states)
-          # assert s_t.shape[:2] == (1, batch_size)
-          idxs = torch.argmax(s_t, dim=-1)
-          output_idxs.append(idxs.squeeze(0).cpu().data.numpy().tolist())
+            s_t, cur_states = self.forward(torch.tensor(output_idxs[-1:], device=device, dtype=torch.long), cur_states)
+            # assert s_t.shape[:2] == (1, batch_size)
+            idxs = torch.argmax(s_t, dim=-1)
+            output_idxs.append(idxs.squeeze(0).cpu().data.numpy().tolist())
 
         outputs = []
         for b in range(batch_size):
-          output_word = ''
-          for pos in range(1, max_length):
-            idx = output_idxs[pos][b]
-            if idx == self.target_vocab.end_of_word:
-              break
-            output_word += self.target_vocab.id2char[idx]
-          outputs.append(output_word)
+            output_word = ''
+            for pos in range(1, max_length):
+                idx = output_idxs[pos][b]
+                if idx == self.target_vocab.end_of_word:
+                    break
+                output_word += self.target_vocab.id2char[idx]
+            outputs.append(output_word)
         return outputs
 
         ### END YOUR CODE
