@@ -20,8 +20,14 @@ class Highway(nn.Module):
             input tensor).
         """
         super(Highway, self).__init__()
+        # assert dim > 0, 'Expected positve dim, found {}'.format(dim)
+        # self.dim = dim
         self.proj = nn.Linear(dim, dim)
         self.gate = nn.Linear(dim, dim)
+        # assert(self.proj.weight.shape == (dim, dim))
+        # assert(self.proj.bias.shape == (dim,))
+        # assert(self.gate.weight.shape == (dim, dim))
+        # assert(self.gate.bias.shape == (dim,))
 
     def forward(self, x):
         """Passes 'x' through the highway network.
@@ -31,9 +37,13 @@ class Highway(nn.Module):
 
         @returns tensor.Tensor : Output tensor with the same shape as input.
         """
+        # assert(x.shape[-1] == self.dim)
         x_proj = torch.relu(self.proj(x))
+        # assert(x_proj.shape == x.shape)
         x_gate = torch.sigmoid(self.gate(x))
+        # assert(x_proj.shape == x.shape)
         x_highway = x_gate * x_proj + (1-x_gate) * x
+        # assert(x_highway.shape == x.shape)
         return x_highway
 
 ### END YOUR CODE

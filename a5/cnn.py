@@ -25,6 +25,8 @@ class CNN(nn.Module):
             produced is the same as input 'embed_size'.
         """
         super(CNN, self).__init__()
+        # assert embed_size > 0, \
+        #         'Expected positive embed_size, found {}'.format(embed_size)
         self.conv = nn.Conv1d(embed_size, embed_size, kernel_size)
         self.relu = nn.ReLU()
 
@@ -43,10 +45,18 @@ class CNN(nn.Module):
         # assert x.shape[1] == self.dim
         sents_len, batch_size, word_len, embed_size = x.shape
         x = x.permute(0, 1, 3, 2)
+        # print(x)
         x = x.view(-1, embed_size, word_len)
+        # assert x.shape == (sents_len*batch_size, embed_size, word_len)
+        # print(x)
         x = self.conv(x)
+        # assert x.shape == (sents_len*batch_size, embed_size, word_len-kernel_size+1)
+        # print(x)
         x = self.relu(x)
-        x = torch.max(x, dim=-2)
+        # print(x)
+        x = torch.max(x, dim=-1)[0]
+        # assert x.shape == (sents_len*batch_size, embed_size)
+        # print(x)
         return x.view(sents_len, batch_size, embed_size)
 
 ### END YOUR CODE

@@ -1,9 +1,7 @@
 pytorch
 .DS_Store
 __pycache__
-model.bin
-model.bin.optim
-model1.bin
-model1.bin.optim
+model*.bin
+model*.bin.optim
 vocab.json
 ._*

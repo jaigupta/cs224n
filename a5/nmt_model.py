@@ -58,9 +58,9 @@ class NMT(nn.Module):
         self.dropout = nn.Dropout(self.dropout_rate)
 
         if not no_char_decoder:
-            self.charDecoder = CharDecoder(hidden_size, target_vocab=vocab.tgt)
+           self.charDecoder = CharDecoder(hidden_size, target_vocab=vocab.tgt)
         else:
-            self.charDecoder = None
+           self.charDecoder = None
 
     def forward(self, source: List[List[str]], target: List[List[str]]) -> torch.Tensor:
         """ Take a mini-batch of source and target sentences, compute the log-likelihood of
@@ -161,7 +161,7 @@ class NMT(nn.Module):
 
 
     def decode(self, enc_hiddens: torch.Tensor, enc_masks: torch.Tensor,
-            dec_init_state: Tuple[torch.Tensor, torch.Tensor], target_padded: torch.Tensor) -> torch.Tensor:
+                dec_init_state: Tuple[torch.Tensor, torch.Tensor], target_padded: torch.Tensor) -> torch.Tensor:
         """Compute combined output vectors for a batch.
         @param enc_hiddens (Tensor): Hidden states (b, src_len, h*2), where
                                      b = batch size, src_len = maximum source sentence length, h = hidden size.
@@ -297,12 +297,12 @@ class NMT(nn.Module):
             hyp_num = len(hypotheses)
 
             exp_src_encodings = src_encodings.expand(hyp_num,
-                    src_encodings.size(1),
-                    src_encodings.size(2))
+                                                     src_encodings.size(1),
+                                                     src_encodings.size(2))
 
             exp_src_encodings_att_linear = src_encodings_att_linear.expand(hyp_num,
-                    src_encodings_att_linear.size(1),
-                    src_encodings_att_linear.size(2))
+                                                                           src_encodings_att_linear.size(1),
+                                                                           src_encodings_att_linear.size(2))
 
             ## A4 code
             # y_tm1 = self.vocab.tgt.to_input_tensor(list([hyp[-1]] for hyp in hypotheses), device=self.device)
@@ -317,7 +317,7 @@ class NMT(nn.Module):
             x = torch.cat([y_t_embed, att_tm1], dim=-1)
 
             (h_t, cell_t), att_t, _  = self.step(x, h_tm1,
-                    exp_src_encodings, exp_src_encodings_att_linear, enc_masks=None)
+                                                      exp_src_encodings, exp_src_encodings_att_linear, enc_masks=None)
 
             # log probabilities over target words
             log_p_t = F.log_softmax(self.target_vocab_projection(att_t), dim=-1)
@@ -343,13 +343,13 @@ class NMT(nn.Module):
 
                 # Record output layer in case UNK was generated
                 if hyp_word == "<unk>":
-                    hyp_word = "<unk>"+str(len(decoderStatesForUNKsHere))
+                   hyp_word = "<unk>"+str(len(decoderStatesForUNKsHere))
                    decoderStatesForUNKsHere.append(att_t[prev_hyp_id])
 
                 new_hyp_sent = hypotheses[prev_hyp_id] + [hyp_word]
                 if hyp_word == '</s>':
                     completed_hypotheses.append(Hypothesis(value=new_hyp_sent[1:-1],
-                        score=cand_new_hyp_score))
+                                                           score=cand_new_hyp_score))
                 else:
                     new_hypotheses.append(new_hyp_sent)
                     live_hyp_ids.append(prev_hyp_id)
@@ -360,7 +360,7 @@ class NMT(nn.Module):
                 decodedWords = self.charDecoder.decode_greedy((decoderStatesForUNKsHere.unsqueeze(0), decoderStatesForUNKsHere.unsqueeze(0)), max_length=21, device=self.device)
                 assert len(decodedWords) == decoderStatesForUNKsHere.size()[0], "Incorrect number of decoded words"
                 for hyp in new_hypotheses:
-                    if hyp[-1].startswith("<unk>"):
+                  if hyp[-1].startswith("<unk>"):
                         hyp[-1] = decodedWords[int(hyp[-1][5:])]#[:-1]
 
             if len(completed_hypotheses) == beam_size:
@@ -375,9 +375,9 @@ class NMT(nn.Module):
 
         if len(completed_hypotheses) == 0:
             completed_hypotheses.append(Hypothesis(value=hypotheses[0][1:],
-                score=hyp_scores[0].item()))
+                                                   score=hyp_scores[0].item()))
 
-            completed_hypotheses.sort(key=lambda hyp: hyp.score, reverse=True)
+        completed_hypotheses.sort(key=lambda hyp: hyp.score, reverse=True)
         return completed_hypotheses
 
     @property
@@ -405,9 +405,9 @@ class NMT(nn.Module):
         print('save model parameters to [%s]' % path, file=sys.stderr)
 
         params = {
-                'args': dict(embed_size=self.model_embeddings_source.embed_size, hidden_size=self.hidden_size, dropout_rate=self.dropout_rate),
-                'vocab': self.vocab,
-                'state_dict': self.state_dict()
-                }
+            'args': dict(embed_size=self.model_embeddings_source.embed_size, hidden_size=self.hidden_size, dropout_rate=self.dropout_rate),
+            'vocab': self.vocab,
+            'state_dict': self.state_dict()
+        }
 
         torch.save(params, path)
