@@ -58,6 +58,8 @@ def init_weights(model):
         model.weight.data.fill_(0.3)
         if model.bias is not None:
             model.bias.data.fill_(0.1)
+    elif isinstance(model, nn.Module):
+        model.apply(init_weights)
 
 
 def question_1h_sanity_check():
@@ -114,6 +116,8 @@ def question_1h_sanity_check():
           [ 0.3594,  0.4368,  0.5142 ]]])
 
     verify_sol(inp, expected_output)
+    verify_sol(toch.zeros_like(inp), expected_output)
+    verify_sol(toch.ones_like(inp), expected_output)
 
     print("All Sanity Checks Passed for Question 1h: highway.Highway!")
     print ("-"*80)
@@ -123,7 +127,7 @@ def question_1i_sanity_check():
     """ Sanity check for cnn.CNN module.
     """
     print ("-"*80)
-    print("Running Sanity Check for Question 1h: highway.Highway module")
+    print("Running Sanity Check for Question 1i: cnn.CNN module")
     print ("-"*80)
 
     dim = 3
@@ -193,7 +197,15 @@ def question_1i_sanity_check():
           [0.1984, 0.0000, 0.2634],
           [0.1984, 0.0000, 0.2634]]]))
 
-    print("All Sanity Checks Passed for Question 1h: highway.Highway!")
+    verify_sol(torch.ones_like(inp), torch.tensor(
+        [[[0.1984, 0.0000, 0.2634],
+          [0.1984, 0.0000, 0.2634],
+          [0.1984, 0.0000, 0.2634]],
+         [[0.1984, 0.0000, 0.2634],
+          [0.1984, 0.0000, 0.2634],
+          [0.1984, 0.0000, 0.2634]]]))
+
+    print("All Sanity Checks Passed for Question 1i: cnn.CNN!")
     print ("-"*80)
 
 
