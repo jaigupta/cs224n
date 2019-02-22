@@ -42,6 +42,7 @@ DROPOUT_RATE = 0.0
 
 
 def verify_linear_shape(name, model, shape):
+    assert model is not None, '{} is None'.format(name)
     assert type(model) == nn.Linear, 'Expected nn.Linear module for test.'
     assert model.weight.shape == shape, \
             '{} weight matrix: Expected shape: {}, found: {}'.format(
@@ -77,6 +78,13 @@ def question_1h_sanity_check():
 
     highway.apply(init_weights)
 
+    def verify_sol(inp, expected_output):
+        with torch.no_grad():
+            output_mat = highway(inp)
+        assert output_mat.shape == inp.shape
+        assert(np.allclose(expected_output.numpy(), output_mat.numpy(), rtol=01e-3)), \
+                'Expected output to be {}, found {}'.format(expected_output, output_mat)
+
     inp = torch.tensor(
         [[[0.5, 0.9, 0.5],
           [0.8, 12, 1.333333],
@@ -105,17 +113,14 @@ def question_1h_sanity_check():
           [ 0.4640,  0.3414,  0.2188 ],
           [ 0.3594,  0.4368,  0.5142 ]]])
 
-    with torch.no_grad():
-        output_mat = highway(inp)
-    assert(np.allclose(expected_output.numpy(), output_mat.numpy(), rtol=01e-3)), \
-            'Expected output to be {}, found {}'.format(expected_output, output_mat)
+    verify_sol(inp, expected_output)
 
     print("All Sanity Checks Passed for Question 1h: highway.Highway!")
     print ("-"*80)
 
 
 def question_1i_sanity_check():
-    """ Sanity check for highway.Highway module.
+    """ Sanity check for cnn.CNN module.
     """
     print ("-"*80)
     print("Running Sanity Check for Question 1h: highway.Highway module")
@@ -140,36 +145,35 @@ def question_1i_sanity_check():
     inp = torch.tensor(
         [
          [[[0.5, 0.9, 0.5],
-          [0.8, 12, 1.333333],
-          [0.111, 0.2, 0.12],
-          [0.111, 0.2, 0.12],
-          [0.6, -0.5, 0.5]],
-         [[0.1, -0.4, 0.6],
-          [0.4, 0.0, 0.7],
-          [0.111, 0.2, 0.12],
-          [0.5, -0.8, 0.75],
-          [0.5, 0.6, 0.6]],
-         [[0.3, 0.9, 0.09],
-          [0.9, 0.4, 0.8],
-          [0.111, 0.2, 0.12],
-          [0.6, 0.3, 0.0],
-          [0.2, 0.4, 0.6]]],
-         [[[1.5, 1.9, 1.5],
-          [1.8, 12, 1.333333],
-          [0.111, 0.2, 0.12],
-          [1.111, 1.2, 1.12],
-          [1.6, -1.5, 1.5]],
-         [[1.1, -1.4, 1.6],
-          [1.4, 0.0, 1.7],
-          [0.111, 0.2, 0.12],
-          [1.5, -1.8, 1.75],
-          [1.5, 1.6, 1.6]],
-         [[1.3, 1.9, 1.09],
-          [0.111, 0.2, 0.12],
-          [1.9, 1.4, 1.8],
-          [1.6, 1.3, 1.0],
-          [1.2, 1.4, 1.6]]],
-        ])
+           [0.8, 12, 1.333333],
+           [0.111, 0.2, 0.12],
+           [0.111, 0.2, 0.12],
+           [0.6, -0.5, 0.5]],
+          [[0.1, -0.4, 0.6],
+           [0.4, 0.0, 0.7],
+           [0.111, 0.2, 0.12],
+           [0.5, -0.8, 0.75],
+           [0.5, 0.6, 0.6]],
+          [[0.3, 0.9, 0.09],
+           [0.9, 0.4, 0.8],
+           [0.111, 0.2, 0.12],
+           [0.6, 0.3, 0.0],
+           [0.2, 0.4, 0.6]]],
+          [[[1.5, 1.9, 1.5],
+           [1.8, 12, 1.333333],
+           [0.111, 0.2, 0.12],
+           [1.111, 1.2, 1.12],
+           [1.6, -1.5, 1.5]],
+          [[1.1, -1.4, 1.6],
+           [1.4, 0.0, 1.7],
+           [0.111, 0.2, 0.12],
+           [1.5, -1.8, 1.75],
+           [1.5, 1.6, 1.6]],
+          [[1.3, 1.9, 1.09],
+           [0.111, 0.2, 0.12],
+           [1.9, 1.4, 1.8],
+           [1.6, 1.3, 1.0],
+           [1.2, 1.4, 1.6]]]])
     # print(inp.shape)
 
     expected_output = torch.tensor(
