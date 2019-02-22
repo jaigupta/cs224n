@@ -20,6 +20,7 @@ class Highway(nn.Module):
             input tensor).
         """
         super(Highway, self).__init__()
+        # assert dim > 0, 'Expected positve dim, found {}'.format(dim)
         # self.dim = dim
         self.proj = nn.Linear(dim, dim)
         self.gate = nn.Linear(dim, dim)

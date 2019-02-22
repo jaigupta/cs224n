@@ -59,7 +59,8 @@ def init_weights(model):
         if model.bias is not None:
             model.bias.data.fill_(0.1)
     elif isinstance(model, nn.Module):
-        model.apply(init_weights)
+        for submodel in model.children():
+            init_weights(submodel)
 
 
 def question_1h_sanity_check():
@@ -78,7 +79,7 @@ def question_1h_sanity_check():
     verify_linear_shape("Highway.proj", highway.proj, (3, 3))
     verify_linear_shape("Highway.gate", highway.gate, (3, 3))
 
-    highway.apply(init_weights)
+    init_weights(highway)
 
     def verify_sol(inp, expected_output):
         with torch.no_grad():
@@ -116,8 +117,32 @@ def question_1h_sanity_check():
           [ 0.3594,  0.4368,  0.5142 ]]])
 
     verify_sol(inp, expected_output)
-    verify_sol(toch.zeros_like(inp), expected_output)
-    verify_sol(toch.ones_like(inp), expected_output)
+    verify_sol(torch.zeros_like(inp), torch.tensor(
+        [[[0.0525, 0.0525, 0.0525],
+          [0.0525, 0.0525, 0.0525],
+          [0.0525, 0.0525, 0.0525],
+          [0.0525, 0.0525, 0.0525]],
+         [[0.0525, 0.0525, 0.0525],
+          [0.0525, 0.0525, 0.0525],
+          [0.0525, 0.0525, 0.0525],
+          [0.0525, 0.0525, 0.0525]],
+         [[0.0525, 0.0525, 0.0525],
+          [0.0525, 0.0525, 0.0525],
+          [0.0525, 0.0525, 0.0525],
+          [0.0525, 0.0525, 0.0525]]]))
+    verify_sol(torch.ones_like(inp), torch.tensor(
+        [[[1., 1., 1.],
+          [1., 1., 1.],
+          [1., 1., 1.],
+          [1., 1., 1.]],
+         [[1., 1., 1.],
+          [1., 1., 1.],
+          [1., 1., 1.],
+          [1., 1., 1.]],
+         [[1., 1., 1.],
+          [1., 1., 1.],
+          [1., 1., 1.],
+          [1., 1., 1.]]]))
 
     print("All Sanity Checks Passed for Question 1h: highway.Highway!")
     print ("-"*80)
@@ -137,7 +162,7 @@ def question_1i_sanity_check():
     conv_1d = next(x for x in cnn.children())
     assert conv_1d, "nn.Conv1d not found registered with the CNN module."
 
-    cnn.apply(init_weights)
+    init_weights(cnn)
 
     def verify_sol(inp, expected_output):
         with torch.no_grad():
@@ -163,7 +188,7 @@ def question_1i_sanity_check():
            [0.111, 0.2, 0.12],
            [0.6, 0.3, 0.0],
            [0.2, 0.4, 0.6]]],
-          [[[1.5, 1.9, 1.5],
+         [[[1.5, 1.9, 1.5],
            [1.8, 12, 1.333333],
            [0.111, 0.2, 0.12],
            [1.111, 1.2, 1.12],
@@ -198,12 +223,12 @@ def question_1i_sanity_check():
           [0.1984, 0.0000, 0.2634]]]))
 
     verify_sol(torch.ones_like(inp), torch.tensor(
-        [[[0.1984, 0.0000, 0.2634],
-          [0.1984, 0.0000, 0.2634],
-          [0.1984, 0.0000, 0.2634]],
-         [[0.1984, 0.0000, 0.2634],
-          [0.1984, 0.0000, 0.2634],
-          [0.1984, 0.0000, 0.2634]]]))
+        [[[0.0000, 0.1058, 0.7689],
+          [0.0000, 0.1058, 0.7689],
+          [0.0000, 0.1058, 0.7689]],
+         [[0.0000, 0.1058, 0.7689],
+          [0.0000, 0.1058, 0.7689],
+          [0.0000, 0.1058, 0.7689]]]))
 
     print("All Sanity Checks Passed for Question 1i: cnn.CNN!")
     print ("-"*80)

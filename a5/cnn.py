@@ -25,6 +25,8 @@ class CNN(nn.Module):
             produced is the same as input 'embed_size'.
         """
         super(CNN, self).__init__()
+        # assert embed_size > 0, \
+        #         'Expected positive embed_size, found {}'.format(embed_size)
         self.conv = nn.Conv1d(embed_size, embed_size, kernel_size)
         self.relu = nn.ReLU()
 
