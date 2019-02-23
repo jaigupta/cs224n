@@ -7,3 +7,4 @@ vocab.json
 ._*
 *.pickle
 *.weights
+*saved_params_*.npy
