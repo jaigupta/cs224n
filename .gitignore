@@ -5,3 +5,5 @@ model*.bin
 model*.bin.optim
 vocab.json
 ._*
+*.pickle
+*.weights
